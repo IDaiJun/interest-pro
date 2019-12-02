@@ -29,7 +29,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/**/*.html", "/**/*.css", "/**/*.js", "/**/swagger-resources/**", "/**/*.woff2", "/**/v2/**").permitAll()
             .anyRequest()
             .authenticated();
-
         http.
             cors().disable()
             .csrf().disable();

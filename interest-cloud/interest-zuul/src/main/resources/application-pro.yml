@@ -1,0 +1,46 @@
+#dev
+server:
+  port: 8081
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+zuul:
+  host:
+    connect-timeout-millis: 10000
+    socket-timeout-millis: 10000
+  add-proxy-headers: true
+  #处理http请求头为空的问题，不过滤掉cookie
+  sensitive-headers:
+  #自定义路由映射
+  routes:
+    auth:
+      path: /interest/auth/**
+      serviceId: interest-auth
+      stripPrefix: false
+    user:
+      path: /interest/user/**
+      serviceId: interest-user
+      stripPrefix: false
+    bbs:
+      path: /interest/bbs/**
+      serviceId: interest-bbs
+      stripPrefix: false
+    blog:
+      path: /interest/blog/**
+      serviceId: interest-blog
+      stripPrefix: false
+    message:
+      path: /interest/message/**
+      serviceId: interest-message
+      stripPrefix: false
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+logging:
+  # 你需要存储日志的目录
+  file: F:/interest/file/log/interest-zuul.log
+  level:
+    org.springframework.cloud: DEBUG
+    com.interest.zuul: DEBUG
+    com.netflix: DEBUG

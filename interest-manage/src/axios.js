@@ -68,9 +68,9 @@ axios.interceptors.response.use(
           break;
       }
     }
-    // console.log(JSON.stringify(error));//console : Error: Request failed with status code 402
-    /*return Promise.reject(error.response.data)*/
-    return Promise.reject("");
+    console.log(JSON.stringify(error));//console : Error: Request failed with status code 402
+    return Promise.reject(error.response.data)
+    //return Promise.reject("");
   }
 );
 

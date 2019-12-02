@@ -1,13 +1,10 @@
 spring:
   application:
     name: interest-eureka
-server:
-  port: 8761
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-    service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  freemarker:
+    #是否优先从文件系统加载template，默认值为true
+    prefer-file-system-access: false
+  profiles:
+    active: dev
+    #active: test
+    #active: pro

@@ -4,7 +4,7 @@ import com.interest.bbs.dao.ReplyCardDao;
 import com.interest.bbs.model.entity.ReplyCardEntity;
 import com.interest.bbs.model.request.ReplyCardRequest;
 import com.interest.bbs.model.response.ReplyCardVO;
-import com.interest.bbs.mq.InterestSource;
+import com.interest.bbs.mq.InterestSourceProducer;
 import com.interest.bbs.service.PostCardService;
 import com.interest.bbs.service.ReplyCardService;
 import com.interest.common.feign.InterestMessageFeign;
@@ -16,9 +16,6 @@ import com.interest.common.utils.DateUtil;
 import com.interest.common.utils.SecurityAuthenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.context.annotation.Primary;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +26,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@EnableBinding(InterestSource.class)
 public class ReplyCardServiceImpl implements ReplyCardService {
 
     @Autowired
@@ -48,7 +44,7 @@ public class ReplyCardServiceImpl implements ReplyCardService {
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Autowired
-    private InterestSource interestSource;
+    private InterestSourceProducer interestSourceProducer;
 
     @Override
     public List<ReplyCardVO> replyCardList(int postCardId, int pageSize, int start) {
@@ -84,8 +80,8 @@ public class ReplyCardServiceImpl implements ReplyCardService {
         replyCardEntity.setCreateTime(DateUtil.currentTimestamp());
         replyCardEntity.setContent(replyCardRequest.getContent());
         replyCardEntity.setPostCardId(replyCardRequest.getPostCardId());
-        log.info("insert | reply_card | data : {}", replyCardEntity.toString());
         replyCardDao.insertEntity(replyCardEntity);
+        log.info("insert | reply_card | data : {}", replyCardEntity.toString());
 
         threadPoolTaskExecutor.execute(()->{
             postCardService.updateReplyTime(replyCardEntity.getPostCardId(), replyCardEntity.getCreateTime());
@@ -98,7 +94,7 @@ public class ReplyCardServiceImpl implements ReplyCardService {
         msgRecodeRequest.setReplyTime(replyCardEntity.getCreateTime());
         msgRecodeRequest.setIsRead(0);
 
-        interestSource.messageOutput().send(MessageBuilder.withPayload(msgRecodeRequest).build());
+        interestSourceProducer.sendMsg(msgRecodeRequest);
 //        interestMessageFeign.insertMessage(msgRecodeRequest);
     }
 
@@ -109,7 +105,7 @@ public class ReplyCardServiceImpl implements ReplyCardService {
 
     @Override
     public void delReplyByPostcardId(List<String> postcardIds) {
-        log.info("delete | reply_card | delete reply card | postcardIds: {}",postcardIds);
         replyCardDao.delReplyByPostcardId(postcardIds);
+        log.info("delete | reply_card | delete reply card | postcardIds: {}",postcardIds);
     }
 }

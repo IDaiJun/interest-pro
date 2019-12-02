@@ -11,13 +11,10 @@ import com.interest.common.utils.SecurityAuthenUtil;
 import com.interest.message.dao.MsgRecordsDao;
 import com.interest.message.model.entity.MsgRecordEntity;
 import com.interest.message.model.response.MsgRecordVO;
-import com.interest.message.mq.InterestSink;
 import com.interest.message.service.MsgRecordsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +23,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@EnableBinding(InterestSink.class)
 public class MsgRecordsServiceImpl implements MsgRecordsService {
 
     @Autowired
@@ -49,22 +45,13 @@ public class MsgRecordsServiceImpl implements MsgRecordsService {
         return msgRecordsDao.getUnreadMsgCount(userId);
     }
 
-    @StreamListener(InterestSink.MESSAGE_INPUT)
-    public void insertMessageByMQ(MsgRecodeRequest msgRecodeRequest) {
-        log.info("get data by MQ | " + InterestSink.MESSAGE_INPUT + " | params: {}", msgRecodeRequest);
-        MsgRecordEntity msgRecordEntity = new MsgRecordEntity();
-        BeanUtils.copyProperties(msgRecodeRequest, msgRecordEntity);
-        log.info("insert | msg_records | data : {}", msgRecordEntity.toString());
-        msgRecordsDao.addMsg(msgRecordEntity);
-    }
-
     @Override
     public void insertMessage(MsgRecodeRequest msgRecodeRequest) {
         threadPoolTaskExecutor.execute(() -> {
             MsgRecordEntity msgRecordEntity = new MsgRecordEntity();
             BeanUtils.copyProperties(msgRecodeRequest, msgRecordEntity);
-            log.info("insert | msg_records | data : {}", msgRecordEntity.toString());
             msgRecordsDao.addMsg(msgRecordEntity);
+            log.info("insert | msg_records | data : {}", msgRecordEntity.toString());
         });
     }
 
@@ -111,10 +98,7 @@ public class MsgRecordsServiceImpl implements MsgRecordsService {
                 }
             });
         });
-
-
         int size = msgRecordsDao.getMsgSizeByUserId(userId);
-
         PageResult<List<MsgRecordVO>> pageResult = new PageResult<>();
         pageResult.setTotalCount(size);
         pageResult.setData(msgRecordVOList);
@@ -123,9 +107,8 @@ public class MsgRecordsServiceImpl implements MsgRecordsService {
 
     @Override
     public void updateMsgRecordIsRead(int msgRecordId, int readSign) {
-
-        log.info("update | msg_records | update message readSign | params: (id: {}, readSign: {})", msgRecordId, readSign);
         msgRecordsDao.updateMsgRecordIsRead(msgRecordId, readSign);
+        log.info("update | msg_records | update message readSign | params: (id: {}, readSign: {})", msgRecordId, readSign);
     }
 
 }

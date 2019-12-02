@@ -1,0 +1,16 @@
+server:
+  port: 8761
+eureka:
+  #指定主机名称
+  instance:
+    hostname: localhost
+  client:
+    #由于自己就是服务器，不需要注册到自己
+    register-with-eureka: false
+    #由于自己就是服务器，不需要从服务器获取注册信息
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    #自我检测,自我保护模式，开发环境可以关闭
+    enable-self-preservation: false

@@ -22,8 +22,8 @@
     </resultMap>
 
     <insert id="insertEntity" parameterType="EmailEntity">
-		insert into email(userid,title,email,name,content,createtime)
-		values (#{userid},#{title},#{email},#{name},#{content},#{createtime})
+		insert into email(user_id,title,email,name,content,create_time)
+		values (#{userId},#{title},#{email},#{name},#{content},#{createTime})
 	</insert>
 
     <select id="getEmailsList" resultMap="emailVO">

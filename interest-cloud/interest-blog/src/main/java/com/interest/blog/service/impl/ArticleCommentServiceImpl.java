@@ -5,7 +5,7 @@ import com.interest.blog.model.entity.ArticleCommentEntity;
 import com.interest.blog.model.request.ArticleCommentRequest;
 import com.interest.blog.model.response.ArticleCommentVO;
 import com.interest.blog.model.response.ArticleReplyCommentVO;
-import com.interest.blog.mq.InterestSource;
+import com.interest.blog.mq.InterestSourceProducer;
 import com.interest.blog.service.ArticleCommentService;
 import com.interest.blog.service.ArticleService;
 import com.interest.common.feign.InterestMessageFeign;
@@ -19,8 +19,6 @@ import com.interest.common.utils.DateUtil;
 import com.interest.common.utils.SecurityAuthenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@EnableBinding(InterestSource.class)
 public class ArticleCommentServiceImpl implements ArticleCommentService {
 
     @Autowired
@@ -46,7 +43,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     private InterestUserFeign interestUserFeign;
 
     @Autowired
-    private InterestSource interestSource;
+    private InterestSourceProducer interestSourceProducer;
 
     @Override
     public void putArticleCommentService(ArticleCommentRequest articleCommentRequest) {
@@ -73,7 +70,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         msgRecodeRequest.setCommentId(articleCommentEntity.getId());
         msgRecodeRequest.setReplyTime(articleCommentEntity.getCreateTime());
         msgRecodeRequest.setIsRead(0);
-        interestSource.messageOutput().send(MessageBuilder.withPayload(msgRecodeRequest).build());
+        interestSourceProducer.sendMsg(msgRecodeRequest);
 //        interestMessageFeign.insertMessage(msgRecodeRequest);
 
         if (articleCommentRequest.getReplierId() != null) {
@@ -83,7 +80,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
             commentMsgRecordRequest.setCommentId(articleCommentEntity.getId());
             commentMsgRecordRequest.setReplyTime(articleCommentEntity.getCreateTime());
             commentMsgRecordRequest.setIsRead(0);
-            interestSource.messageOutput().send(MessageBuilder.withPayload(commentMsgRecordRequest).build());
+            interestSourceProducer.sendMsg(commentMsgRecordRequest);
 //            interestMessageFeign.insertMessage(commentMsgRecordRequest);
         }
 

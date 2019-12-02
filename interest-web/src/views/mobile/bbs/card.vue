@@ -139,11 +139,9 @@ export default {
           this.postcardSet(response.data.data);
         }.bind(this)
       )
-      .catch(
-        function(error) {
-          alter(error);
-        }.bind(this)
-      );
+      .catch(function(error) {
+            alert(error);
+        }.bind(this));
     this.replyCardListGet({
       pageInfo: this.pageInfo,
       postcardid: this.postcardid
