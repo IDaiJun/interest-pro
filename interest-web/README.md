@@ -82,7 +82,7 @@ UI 组件库：
 
  - 启动：(注意：最好换cnpm，npm我这边启动报404)
 	 1. 命令行进入项目文件夹
-	 2. 运行npm install（初次启动）
+	 2. 运行npm install（初次启动）|| cnpm install
 	 3. 运行npm run serve启动前端工程
 - 打包命令：
 	运行npm run build
