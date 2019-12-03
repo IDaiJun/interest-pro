@@ -47,105 +47,93 @@
     </div>
 </template>
 <script>
-export default {
-  data() {
-    return {
-      flage: false,
-      value2: 0,
-      homeArticle: [],
-      bannerList: []
+    export default {
+        data() {
+            return {
+                name:"主页",
+                flage: false,
+                value2: 0,
+                homeArticle: [],
+                bannerList: []
+            };
+        },
+        mounted() {
+            this.getHomeArticle();
+            this.getBanner();
+        },
+        watch: {
+            $route: ["getHomeArticle"]
+        },
+        methods: {
+            getBanner() {
+                this.axios({
+                    method: "get",
+                    url: "/interest/bbs/public/banners"
+                })
+                    .then(
+                        function (response) {
+                            this.bannerList = response.data.data;
+                        }.bind(this)
+                    )
+                    .catch(
+                        function (error) {
+                            this.$Message.error("获取"+this.name+"信息失败："+error.message);
+                        }.bind(this)
+                    );
+            },
+            getHomeArticle() {
+                let title = (this.$route.params.title == null ? "" : this.$route.params.title);
+                this.axios({
+                    method: "get",
+                    url: "/interest/bbs/public/interests",
+                    params: {
+                        title: title
+                    }
+                })
+                    .then(
+                        function (response) {
+                            this.homeArticle = response.data.data;
+                            if (title != ""){
+                                if (this.homeArticle.length == 0) {
+                                    this.flage = true;
+                                } else {
+                                    this.flage = false;
+                                }
+                            }
+                        }.bind(this)
+                    )
+                    .catch(
+                        function (error) {
+                            this.$Message.error("获取"+this.name+"信息失败："+error.message);
+                        }.bind(this)
+                    );
+            }
+        }
     };
-  },
-  mounted() {
-    this.getHomeArticle();
-    this.getBanner();
-  },
-  watch: {
-    $route: ["getHomeArticle"]
-  },
-  methods: {
-    getBanner() {
-      this.axios({
-        method: "get",
-        url: "/interest/bbs/public/banners"
-      })
-        .then(
-          function(response) {
-            this.bannerList = response.data.data;
-          }.bind(this)
-        )
-        .catch(
-          function(error) {
-            this.$Message.error("无权限");
-          }.bind(this)
-        );
-    },
-    getHomeArticle() {
-      if (this.$route.params.title == null) {
-        this.axios({
-          method: "get",
-          url: "/interest/bbs/public/interests"
-        })
-          .then(
-            function(response) {
-              this.homeArticle = response.data.data;
-            }.bind(this)
-          )
-          .catch(
-            function(error) {
-              this.$Message.error("无权限");
-            }.bind(this)
-          );
-      } else {
-        this.axios({
-          method: "get",
-          url: "/interest/bbs/public/interests",
-          params: {
-            title: this.$route.params.title
-          }
-        })
-          .then(
-            function(response) {
-              this.homeArticle = response.data.data;
-              if (this.homeArticle.length == 0) {
-                this.flage = true;
-              } else {
-                this.flage = false;
-              }
-            }.bind(this)
-          )
-          .catch(
-            function(error) {
-              this.$Message.error("无权限");
-            }.bind(this)
-          );
-      }
-    }
-  }
-};
 </script>
 <style>
-.content-background {
-  background: #fff;
-}
-.box-flex .imgpic {
-  transition: 0.7s all;
-  opacity: 0.8;
-}
+    .content-background {
+        background: #fff;
+    }
 
-.box-flex .imgpic:hover {
-  opacity: 1;
-  box-shadow: 1px 1px 20px #333;
-  transform: scale(1.1, 1.1);
-  cursor: pointer;
-}
+    .box-flex .imgpic {
+        transition: 0.7s all;
+        opacity: 0.8;
+    }
 
-.lineThrou {
-  transition: 0.8s all;
-}
+    .box-flex .imgpic:hover {
+        opacity: 1;
+        box-shadow: 1px 1px 20px #333;
+        transform: scale(1.1, 1.1);
+        cursor: pointer;
+    }
 
-.lineThrou:hover {
-  text-decoration: line-through;
-  cursor: pointer;
-}
+    .lineThrou {
+        transition: 0.8s all;
+    }
+
+    .lineThrou:hover {
+        text-decoration: line-through;
+        cursor: pointer;
+    }
 </style>

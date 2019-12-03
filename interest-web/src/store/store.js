@@ -20,8 +20,6 @@ export default new Vuex.Store({
     // domainName: "https://www.lovemtt.com",
     // userUrlPre: "https://www.lovemtt.com/page/user/",
     count: 0,
-    /*登录界面判断是否显示错误提示*/
-    ifSign: false
   },
   getters: {
     doneTodos: state => {
@@ -32,9 +30,6 @@ export default new Vuex.Store({
     },
     getTodoById: state => id => {
       return state.todos.find(todo => todo.id === id);
-    },
-    getSign: state => {
-      return state.ifSign;
     },
     _isMobile() {
       let flag = navigator.userAgent.match(
@@ -50,12 +45,6 @@ export default new Vuex.Store({
     increment(state, number) {
       state.count += number;
     },
-    setSignTrue(state) {
-      state.ifSign = true;
-    },
-    setSignFalse(state) {
-      state.ifSign = false;
-    }
   },
   actions: {
     increment(context) {
